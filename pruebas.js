@@ -25,48 +25,57 @@ fetch(origen_url)
                         //Obtener las coordenadas de los puntos de la ruta
                         var coords=data3.features[0].geometry.coordinates.map(function(coord){
                             //console.log(coord[1], coord[0]);
-                            return [{latitud: coord[1], longitud: coord[0]}];
+                            return [coord[1], coord[0]];
                         });
+
+
+
+                        const gasolinerasEnRuta=[];
                         coords.forEach(function(coord) {
-                            const lat = coord.lat;
-                            const lng = coord.lng;
+                            const lat = coord[1];
+                            const lng = coord[0];
 
-                            searchGasStations(lat,lng);
+                            //console.log(lat);
+                            //console.log(lng);
+                        
+                            let valor=searchGasStations(lat,lng);
+                            gasolinerasEnRuta.push(valor)
+                            //searchGasStations(lat,lng);
 
                         });
-                            
-                        //searchGasStations(lat,lng);
+
+                        for(let i=0; i<=gasolinerasEnRuta.length;i++){
+                            console.log(gasolinerasEnRuta[i]);
+                        }
+                        //console.log(gasolinerasEnRuta);
+                        
+                        
 
                           });
 
                             function searchGasStations(lat,lng) {
-                                const url = `https://www.elpreciodelagasolina.com/api/stations.json`;
-
+                                const url= "https://api.geoapify.com/v2/place-details?lat="+lng+"&lon="+lat+"&features=drive_5.fuel&apiKey=01c0e93722284dec8b258567053632d1"
                                 fetch(url)
                                     .then(function(response){
-                                       return response.json();
+                                        return response.json();
                                     })
                                     .then(function(data4){
-                                        //console.log(data4.data.stations.length);
-                                        //console.log(data4.data.stations[0].id);
-                                        console.log("Entro a data4");
-                                        if(data4.data && data4.data.stations){
-                                            for(let i=0; i<=data4.data.stations.length;i++){
-                                                
-                                                if(data4.data.stations[i] && data4.data.stations[i]._latitude && data4.data.stations[i]._longitude && data4.data.stations[i]._province){
-                                                    if(data4.data.stations[i]._province=="PALMAS (LAS)"){
-                                                            console.log(data4.data.stations[i].name);
-                                                            console.log(data4.data.stations[i]._latitude);
-                                                            console.log(data4.data.stations[i]._longitude);
-                                                            console.log(data4.data.stations[i]._location);     
-                                                    }
-                                                }
+                                        numeroElementos=data4.features.length;
+                                        //console.log(numeroElementos);
+                                        for(let i=1; i<=numeroElementos; i++){
+                                            if(data4.features[i] && data4.features[i].properties.lat && data4.features[i].properties.lon){
+                                                let latitud=data4.features[i].properties.lat;
+                                                let longitud=data4.features[i].properties.lon;
+                                                //console.log("Pene"+latitud, longitud);
+                                                return [latitud, longitud];
+                                            }else{
+                                                i++;
                                             }
                                         }
-                                        
+                                    
                                     })
-                                    .catch(error => console.error(error));
-                               
+                                    .catch(error => console.log('error', error));
+                            
                             }       
                 })
             })
